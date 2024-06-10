@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class ClipBoundsSetter : MonoBehaviour {
+    public GameObject parentCube; // The cube that defines the clipping area
+    public Material clipMaterial;
+
+    void Start() {
+        // Ensure the material is using the correct shader
+        if (clipMaterial.shader.name != "Custom/ClipShader") {
+            Debug.LogError("Assigned material does not use the Custom/ClipShader");
+            return;
+        }
+
+        // Calculate the bounds of the parent cube
+        Bounds bounds = parentCube.GetComponent<Renderer>().bounds;
+
+        // Set the bounds in the shader
+        clipMaterial.SetVector("_MinBounds", bounds.min);
+        clipMaterial.SetVector("_MaxBounds", bounds.max);
+    }
+}
