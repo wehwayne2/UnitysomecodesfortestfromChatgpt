@@ -3,6 +3,9 @@ unsigned long lastQuaternionUpdate = 0;
 const unsigned long lightAndRangeInterval = 100;
 const unsigned long quaternionInterval = 10;
 
+long rangeInCentimeters = 0;
+float remappedLightValue = 0.0;
+
 void loop() {
   uduino.update();
   
@@ -15,16 +18,10 @@ void loop() {
 
       // Light Sensor
       int lightValue = analogRead(lightSensorPin);
-      float remappedLightValue = map(lightValue, 20, 450, 0, 100);
+      remappedLightValue = map(lightValue, 20, 450, 0, 100);
 
       // Ultrasonic Ranger
-      long RangeInCentimeters = ultrasonic.MeasureInCentimeters(); // two measurements should keep an interval
-
-      // Print values
-      uduino.print(RangeInCentimeters); // 0~400cm
-      uduino.print("|");
-      uduino.print(remappedLightValue);
-      uduino.print("|");
+      rangeInCentimeters = ultrasonic.MeasureInCentimeters(); // two measurements should keep an interval
     }
 
     // Check if it's time to update quaternion values
@@ -49,9 +46,19 @@ void loop() {
           mpu.getFIFOBytes(fifoBuffer, packetSize);
           fifoCount -= packetSize;
 
-          // Send quaternion data
+          // Print all values together
+          uduino.print(rangeInCentimeters); // 0~400cm
+          uduino.print("|");
+          uduino.print(remappedLightValue);
+          uduino.print("|");
           SendQuaternion(); // This function should handle its own printing
         }
+      } else {
+        // Print values even if MPU is not initialized
+        uduino.print(rangeInCentimeters); // 0~400cm
+        uduino.print("|");
+        uduino.print(remappedLightValue);
+        uduino.print("|");
       }
     }
   }
