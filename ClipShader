@@ -1,0 +1,32 @@
+Shader "Custom/ClipShader" {
+    Properties {
+        _MainTex ("Texture", 2D) = "white" {}
+        _MinBounds ("Min Bounds", Vector) = (0, 0, 0, 0)
+        _MaxBounds ("Max Bounds", Vector) = (0, 0, 0, 0)
+    }
+    SubShader {
+        Tags { "RenderType"="Opaque" }
+        CGPROGRAM
+        #pragma surface surf Lambert
+
+        sampler2D _MainTex;
+        float4 _MinBounds;
+        float4 _MaxBounds;
+
+        struct Input {
+            float2 uv_MainTex;
+            float3 worldPos;
+        };
+
+        void surf (Input IN, inout SurfaceOutput o) {
+            if (IN.worldPos.x < _MinBounds.x || IN.worldPos.y < _MinBounds.y || IN.worldPos.z < _MinBounds.z ||
+                IN.worldPos.x > _MaxBounds.x || IN.worldPos.y > _MaxBounds.y || IN.worldPos.z > _MaxBounds.z) {
+                clip(-1); // Discard fragment
+            }
+            o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
+            o.Alpha = 1.0;
+        }
+        ENDCG
+    }
+    FallBack "Diffuse"
+}
