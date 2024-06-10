@@ -31,24 +31,25 @@ void loop() {
         mpu.getFIFOBytes(fifoBuffer, packetSize);
         fifoCount -= packetSize;
 
-        // Combine outputs into one line
-        uduino.print(RangeInCentimeters); // 0~400cm
-        uduino.print("|");
-        uduino.print(remappedLightValue);
-        uduino.print("|");
-
         // Check if it's time to send the quaternion
         if (currentTime - lastQuaternionTime >= 10) {
           SendQuaternion(); // This function should handle its own printing
           lastQuaternionTime = currentTime;
         }
+
+        // Combine outputs into one line, starting with the quaternion
+        uduino.print("|");
+        uduino.print(RangeInCentimeters); // 0~400cm
+        uduino.print("|");
+        uduino.print(remappedLightValue);
       }
     } else {
       // Print values even if MPU is not initialized
+      SendQuaternion(); // This function should handle its own printing
+      uduino.print("|");
       uduino.print(RangeInCentimeters); // 0~400cm
       uduino.print("|");
       uduino.print(remappedLightValue);
-      uduino.print("|");
     }
   }
 
